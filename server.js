@@ -7,18 +7,15 @@ const rateLimit = require("express-rate-limit");
 const app = express();
 app.use(express.json());
 
-// Rate limiting (basic protection)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
 });
 app.use(limiter);
 
-// In-memory storage (for learning only)
 let users = [];
 let notes = [];
 
-// ================= AUTH MIDDLEWARE =================
 function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
@@ -32,7 +29,6 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// ================= REGISTER =================
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;
 
@@ -46,7 +42,6 @@ app.post("/register", async (req, res) => {
     res.json({ message: "User registered successfully" });
 });
 
-// ================= LOGIN =================
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
@@ -66,7 +61,6 @@ app.post("/login", async (req, res) => {
     res.json({ token });
 });
 
-// ================= CREATE NOTE =================
 app.post("/notes", authenticateToken, (req, res) => {
     const { content } = req.body;
 
@@ -83,13 +77,12 @@ app.post("/notes", authenticateToken, (req, res) => {
     res.json(note);
 });
 
-// ================= GET NOTES =================
+
 app.get("/notes", authenticateToken, (req, res) => {
     const userNotes = notes.filter(n => n.user === req.user.username);
     res.json(userNotes);
 });
 
-// ================= START SERVER =================
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);
 });
